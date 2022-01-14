@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Arthead Education</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main-style.css') }}" />
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <a href="{{ url_for('bp_open.signup_get') }}">Sign Up</a>
+    {% block content %}
+    {% endblock %}
+
+    {% block scripts %}
+    {% endblock %}
+</body>
+</html>

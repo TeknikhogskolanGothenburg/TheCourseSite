@@ -1,0 +1,82 @@
+{
+  "user": {
+      "first_name": "",
+      "last_name": "",
+      "full_name": "",
+      "email": "",
+      "password": "",
+      "admin": "",
+      "instructor": "",
+      "date_created": "",
+      "last_signin": "",
+      "status": "",
+      "activated": "",
+      "avatar": "",
+      "address": {
+          "address_line_1": "",
+          "address_line_2": "",
+          "zip": "",
+          "state": "",
+          "country": ""
+      },
+
+      "courses": [
+          {
+              "course_id": "",
+              "progress": "",
+              "expire_date": ""
+          }
+      ],
+
+      "settings": {
+
+      },
+      "social_profiles": [
+
+      ]
+  },
+
+  "courses": [
+      {
+          "course_name": "",
+          "course_description": "",
+          "course_instructor": "",
+          "course_image": "",
+          "course_level": "",
+          "date_created": "",
+          "course_sections": [
+              {
+                  "section_name": "",
+                  "section_description": "",
+                  "section_number": "",
+                  "section_-modules": [
+                      {
+                          "module_name": "",
+                          "module_description": "",
+                          "module_number": "",
+                          "module_content": "",
+                          "module_resources": [
+
+                          ]
+                      }
+                  ]
+              }
+          ]
+      }
+  ],
+
+    "messages": [
+        {
+            "message_title": "",
+            "to": "",
+            "from": "",
+            "sent_time": "",
+            "message_body": "",
+            "read": "",
+            "replies": [
+
+            ]
+        }
+    ]
+}
+

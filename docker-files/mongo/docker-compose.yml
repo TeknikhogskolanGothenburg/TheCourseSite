@@ -1,0 +1,14 @@
+version: "3"
+
+
+services:
+  mongo:
+    image: mongo:latest
+    restart: always
+    ports:
+      - 27028:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: 7082d9753301ab4da89bb950c253c6c3133cfe964f2d9d9339cf5e975d088fe6
+    volumes:
+      - "./db_dump:/db_dump"
