@@ -1,5 +1,12 @@
 from app.persitence.db import Document, db
 
+ACCESS = {
+    'guest': 0,
+    'user': 1,
+    'instructor': 2,
+    'admin': 3
+}
+
 
 class User(Document):
     collection = db.users
@@ -15,3 +22,6 @@ class User(Document):
 
     def get_id(self):
         return self.email
+
+    def has_access(self, level):
+        return ACCESS[self.access_level] >= ACCESS[level]
