@@ -15,7 +15,11 @@
             <a href="{{ url_for('bp_admin.admin_get') }}">Admin</a>
         {% endif %}
 
+        <a href="{{ url_for('bp_user.message_get') }}">Message</a>
+
         <a href="{{ url_for('bp_user.signout_get') }}">Sign Out</a>
+
+        <a href="{{ url_for('bp_user.message_get') }}"><i id="message-symbol" class="fa fa-fw fa-envelope-open no-new-msg"><span class="sup" id="message-count"></span></i></a>
 
     {% else %}
         <a href="{{ url_for('bp_open.signup_get') }}">Sign Up</a>
@@ -26,6 +30,8 @@
     {% block content %}
     {% endblock %}
 
+
+    <script src="{{ url_for('static', filename='/js/check-message.js') }}"></script>
     {% block scripts %}
     {% endblock %}
 </body>

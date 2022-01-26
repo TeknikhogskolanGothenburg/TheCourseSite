@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, make_response
+from flask_login import current_user
 
 from app.controllers.user_controller import create_user, get_user_by_email, verify_user, signin_user
 
@@ -44,5 +45,7 @@ def signin_post():
         return redirect(url_for('bp_open.signin_get'))
 
     signin_user(email)
-
-    return redirect(url_for('bp_open.index'))
+    user_id = str(current_user._id).encode('utf-8')
+    resp = make_response(redirect(url_for('bp_open.index')))
+    resp.set_cookie('user_id', user_id)
+    return resp

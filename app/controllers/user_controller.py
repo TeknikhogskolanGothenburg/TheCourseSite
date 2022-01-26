@@ -58,3 +58,12 @@ def signin_user(email):
         user.last_signin = datetime.datetime.now()
         user.save()
 
+
+def get_user_by_full_name(name):
+    return user_repository.get_user_by_full_name(name)
+
+
+def get_all_users_with_name_starting_with(pattern):
+    result_list = user_repository.get_all_users()
+
+    return [user.full_name for user in result_list if user.full_name.lower().startswith(pattern)]

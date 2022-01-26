@@ -25,3 +25,7 @@ class User(Document):
 
     def has_access(self, level):
         return ACCESS[self.access_level] >= ACCESS[level]
+
+
+class Message(Document):
+    collection = db.messages
