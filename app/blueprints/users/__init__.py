@@ -68,8 +68,10 @@ def avatar_color_post():
 def upload_avatar_post():
     photo = request.files.get('photo', None)
     if photo is not None:
-        avatar_filename = str(current_user._id) + '.' + photo.filename.split('.')[-1]
-        path = os.path.join('static/profile-img', avatar_filename)
+        filename, extension = os.path.splitext(photo.filename)
+        print(filename, extension)
+        avatar_filename = str(current_user._id) + extension
+        path = os.path.join('static','profile-img', avatar_filename)
         photo.save(path)
         current_user.avatar = path
         current_user.save()
