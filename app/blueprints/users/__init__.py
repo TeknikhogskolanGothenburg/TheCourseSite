@@ -1,8 +1,12 @@
+import os
+
+import werkzeug.utils
 from bson import ObjectId
 from flask import Blueprint, redirect, url_for, render_template, request
 from flask_login import logout_user, login_required, current_user
 
 from app.controllers.message_controller import create_message, get_all_messages_for_user, get_message_by_id
+from app.controllers.user_controller import set_avatar_color
 
 bp_user = Blueprint('bp_user', __name__)
 
@@ -18,9 +22,16 @@ def signout_get():
     return redirect(url_for('bp_open.index'))
 
 
-@bp_user.get('/courses')
-def courses_get():
-    return render_template('courses.html')
+@bp_user.get('/profile')
+def profile_get():
+    if current_user.avatar.startswith('http'):
+        background_color = current_user.avatar.split('background=')[1][:6]
+        color = current_user.avatar.split('color=')[1][:6]
+    else:
+        background_color = '000000'
+        color = 'ffffff'
+
+    return render_template('profile.html', background_color=background_color, color=color)
 
 
 @bp_user.get('/message')
@@ -40,7 +51,26 @@ def message_post():
 @bp_user.get('/read_message/<message_id>')
 def read_message(message_id):
     message = get_message_by_id(ObjectId(message_id))
-    message.read = True
-    message.save()
+
     message.message_body = message.message_body.replace('\n', '<br />')
     return render_template('single_message.html', message=message)
+
+
+@bp_user.post('/avatar/color')
+def avatar_color_post():
+    background_color = request.form['background_color']
+    color = request.form['color']
+    set_avatar_color(background_color[1:], color[1:])
+    return redirect(url_for('bp_user.profile_get'))
+
+
+@bp_user.post('/avatar/upload')
+def upload_avatar_post():
+    photo = request.files.get('photo', None)
+    if photo is not None:
+        avatar_filename = str(current_user._id) + '.' + photo.filename.split('.')[-1]
+        path = os.path.join('static/profile-img', avatar_filename)
+        photo.save(path)
+        current_user.avatar = path
+        current_user.save()
+    return redirect(url_for('bp_user.profile_get'))

@@ -1,17 +1,27 @@
 {% extends "base_template.html" %}
 
-{% block content %}
-    <h1>Send a Message</h1>
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='/css/autocomplete.css') }}"/>
+{% endblock %}
 
-    <form action="{{ url_for('bp_user.message_post') }}" method="POST">
-        <div class="autocomplete" style="width:300px;">
-            <input id="userName" type="text" name="to" placeholder="Send message to" autocomplete="off"/>
+
+{% block content %}
+    <div class="card-content">
+        <div class="card">
+            <h1>Send a Message</h1>
+
+            <form action="{{ url_for('bp_user.message_post') }}" method="POST">
+                <div class="autocomplete" style="width:300px;">
+                    <input id="userName" type="text" name="to" placeholder="Send message to" autocomplete="off"/>
+                </div>
+                <div>
+                    <textarea name="message" placeholder="Enter message body (HTML is allowed)"></textarea> <br/>
+                </div>
+                <input type="submit" value="Send">
+            </form>
+
         </div>
-        <div>
-            <textarea name="message" placeholder="Enter message body"></textarea> <br/>
-        </div>
-        <input type="submit" value="Send">
-    </form>
+    </div>
 
     <h1>Mailbox</h1>
 
@@ -26,7 +36,7 @@
                 <td>
                     <a href="{{ url_for('bp_user.read_message', message_id=message._id) }}">{{ message.sender.full_name }}</a>
                 </td>
-                <td>{{ message.sent.year }}-{{ message.sent.month }}-{{ message.sent.day }}</td>
+                <td>{{ message.sent }}</td>
                 <td>{{ message.read }}</td>
             </tr>
         {% endfor %}

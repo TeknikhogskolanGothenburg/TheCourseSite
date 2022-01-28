@@ -1,11 +1,14 @@
 import datetime
+import random
+
 from passlib.hash import argon2
-from flask_login import login_user
+from flask_login import login_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.persitence.repository import user_repository
 
 
 def create_user(first_name, last_name, email, password):
+    background, color = generate_random_avatar_color()
     user = {
         'first_name': first_name,
         'last_name': last_name,
@@ -17,7 +20,7 @@ def create_user(first_name, last_name, email, password):
         'last_signin': None,
         'status': 'offline',
         'activated': False,
-        'avatar': f'https://eu.ui-avatars.com/api/?name={first_name}+{last_name}&background=random',
+        'avatar': f'https://eu.ui-avatars.com/api/?name={first_name}+{last_name}&background={background}&color={color}',
         'address': {
             'address_line_1': None,
             'address_line_2': None,
@@ -67,3 +70,38 @@ def get_all_users_with_name_starting_with(pattern):
     result_list = user_repository.get_all_users()
 
     return [user.full_name for user in result_list if user.full_name.lower().startswith(pattern)]
+
+
+def generate_random_avatar_color():
+    default_colors = [
+        {
+            'background': '0D8ABC',
+            'color': 'ffffff'
+        },
+        {
+            'background': 'CD8ABC',
+            'color': 'dddddd'
+        },
+        {
+            'background': '1AC1F2',
+            'color': '3C1ABD'
+        },
+        {
+            'background': '1A0315',
+            'color': '03FF03'
+        }
+    ]
+    color = random.choice(default_colors)
+    return color['background'], color['color']
+
+
+def set_avatar_color(background_color=None, color=None):
+    user = current_user
+    back, front = generate_random_avatar_color()
+    if background_color is None:
+        background_color = back
+    if color is None:
+        color = front
+
+    user.avatar = f'https://eu.ui-avatars.com/api/?name={user.first_name}+{user.last_name}&background={background_color}&color={color}'
+    user.save()

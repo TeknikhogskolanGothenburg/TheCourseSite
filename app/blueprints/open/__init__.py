@@ -24,7 +24,7 @@ def signup_post():
     password = request.form['password']
 
     if get_user_by_email(email) is not None:
-        flash('Error. An account with this email already exist.')
+        flash('Error. An account with this email already exist.', 'signup')
         return redirect(url_for('bp_open.signup_get'))
 
     create_user(first_name, last_name, email, password)
@@ -41,7 +41,7 @@ def signin_post():
     email = request.form.get('email')
     password = request.form.get('password')
     if not verify_user(email, password):
-        flash('Error signing in. Check your email and password!')
+        flash('Error signing in. Check your email and password!', 'signin')
         return redirect(url_for('bp_open.signin_get'))
 
     signin_user(email)
