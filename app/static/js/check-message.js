@@ -1,12 +1,10 @@
 setInterval(checkMsg, 10000);
 
 function checkMsg() {
-     const xhttp = new XMLHttpRequest();
-        xhttp.open('GET', "http://127.0.0.1:5000/ajax/check_msg", true);
-        xhttp.setRequestHeader('Content-type', 'application/json');
-        xhttp.send();
-        xhttp.onload = function () {
-            let respObj = JSON.parse(this.responseText)
+
+    fetch('http://127.0.0.1:5000/ajax/check_msg')
+        .then(response => response.json())
+        .then(respObj => {
             let msgSymbol = document.getElementById("message-symbol");
             let msgCount = document.getElementById("message-count");
             if(respObj.unread_msg_count > 0) {
@@ -23,5 +21,5 @@ function checkMsg() {
                 msgSymbol.classList.add("fa-envelope-open");
                 msgCount.innerHTML = "";
             }
-        }
+        })
 }

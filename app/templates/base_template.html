@@ -30,10 +30,11 @@
     {% block content %}
     {% endblock %}
 
+
     {% block scripts %}
-    {% if current_user.is_authenticated %}
-    <script src="{{ url_for('static', filename='/js/check-message.js') }}"></script>
-    {% endif %}
+        {% if current_user.is_authenticated %}
+            <script src="{{ url_for('static', filename='/js/check-message.js') }}"></script>
+        {% endif %}
     {% endblock %}
 </body>
 </html>

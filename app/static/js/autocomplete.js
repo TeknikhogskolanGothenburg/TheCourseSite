@@ -1,13 +1,12 @@
 /****************
-    the autocomplete function takes one argument, the text field element
-****************/
-function autocomplete(inp) {
+ the autocomplete function takes one argument, the text field element
+ ****************/
+function autocomplete(input) {
 
-    var currentFocus;
+    let listIndex;
 
     /*execute a function when someone writes in the text field:*/
-    inp.addEventListener("input", function (event) {
-
+    input.addEventListener("input", function (event) {
         let val = this.value;
         if (!val) {
             return false;
@@ -16,31 +15,35 @@ function autocomplete(inp) {
         const params = {
             value: val
         }
-        const xhttp = new XMLHttpRequest();
-        xhttp.open('POST', "http://127.0.0.1:5000/ajax/all_users", true);
-        xhttp.setRequestHeader('Content-type', 'application/json');
-        xhttp.send(JSON.stringify(params));
-        xhttp.onload = function () {
-            let arr = JSON.parse(xhttp.responseText);
 
+        fetch('http://127.0.0.1:5000/ajax/all_users', {
+            method: 'post',
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: JSON.stringify(params)
+        })
+
+        .then(response => response.json())
+        .then(arr => {
             /*close any already open lists of autocompleted values*/
             closeAllLists();
 
             // Set current focus to -1, so we start from top
             // when we use the arrow keys
-            currentFocus = -1;
+            listIndex = -1;
 
             /*create a DIV element that will contain the items (values):*/
-            let autoCompleteList = document.createElement("DIV");
-            autoCompleteList.setAttribute("id", inp.id + "autocomplete-list");
+            let autoCompleteList = document.createElement("div");
+            autoCompleteList.setAttribute("id", input.id + "autocomplete-list");
             autoCompleteList.setAttribute("class", "autocomplete-items");
             /*append the DIV element as a child of the autocomplete container:*/
-            inp.parentNode.appendChild(autoCompleteList);
+            input.parentNode.appendChild(autoCompleteList);
 
             /*for each item in the array...*/
             arr.forEach(user => {
                 /*create a DIV element for each matching element:*/
-                let listElement = document.createElement("DIV");
+                let listElement = document.createElement("div");
                 /*make the matching letters bold:*/
                 listElement.innerHTML = "<strong>" + user.substr(0, val.length) + "</strong>";
                 listElement.innerHTML += user.substr(val.length);
@@ -49,56 +52,71 @@ function autocomplete(inp) {
                 /*execute a function when someone clicks on the item value (DIV element):*/
                 listElement.addEventListener("click", function (e) {
                     /*insert the value for the autocomplete text field:*/
-                    inp.value = e.target.getElementsByTagName("input")[0].value;
+                    input.value = e.target.getElementsByTagName("input")[0].value;
                     /*close the list of autocompleted values,
                     (or any other open lists of autocompleted values:*/
                     closeAllLists();
                 });
                 autoCompleteList.appendChild(listElement);
             })
-        }
+        })
+        .catch(error => alert(error));
+
     });
+
     /*execute a function presses a key on the keyboard:*/
-    inp.addEventListener("keydown", function (e) {
-        var x = document.getElementById(e.target.id + "autocomplete-list");
-        if (x) x = x.getElementsByTagName("div");
-        if (e.keyCode == 40) {
+    input.addEventListener("keydown", function (e) {
+        let autoCompleteList = document.getElementById(e.target.id + "autocomplete-list");
+        if (autoCompleteList) {
+            autoCompleteList = autoCompleteList.getElementsByTagName("div");
+        }
+
+        if (e.keyCode === 40) {
             /*If the arrow DOWN key is pressed,
             increase the currentFocus variable:*/
-            currentFocus++;
+            listIndex++;
             /*and and make the current item more visible:*/
-            addActive(x);
-        } else if (e.keyCode == 38) { //up
+            addActive(autoCompleteList);
+        } else if (e.keyCode === 38) { //up
             /*If the arrow UP key is pressed,
             decrease the currentFocus variable:*/
-            currentFocus--;
+            listIndex--;
             /*and and make the current item more visible:*/
-            addActive(x);
-        } else if (e.keyCode == 13) {
+            addActive(autoCompleteList);
+        } else if (e.keyCode === 13) {
             /*If the ENTER key is pressed, prevent the form from being submitted,*/
             e.preventDefault();
-            if (currentFocus > -1) {
+            if (listIndex > -1) {
                 /*and simulate a click on the "active" item:*/
-                if (x) x[currentFocus].click();
+                if (autoCompleteList) {
+                    autoCompleteList[listIndex].click();
+                }
             }
         }
     });
 
-    function addActive(x) {
+    function addActive(autoCompleteList) {
         /*a function to classify an item as "active":*/
-        if (!x) return false;
+        if (!autoCompleteList) {
+            return false;
+        }
         /*start by removing the "active" class on all items:*/
-        removeActive(x);
-        if (currentFocus >= x.length) currentFocus = 0;
-        if (currentFocus < 0) currentFocus = (x.length - 1);
+        removeActive(autoCompleteList);
+        if (listIndex >= autoCompleteList.length) {
+            listIndex = 0;
+        }
+
+        if (listIndex < 0) {
+            listIndex = (autoCompleteList.length - 1);
+        }
         /*add class "autocomplete-active":*/
-        x[currentFocus].classList.add("autocomplete-active");
+        autoCompleteList[listIndex].classList.add("autocomplete-active");
     }
 
-    function removeActive(x) {
+    function removeActive(autoCompleteList) {
         /*a function to remove the "active" class from all autocomplete items:*/
-        for (var i = 0; i < x.length; i++) {
-            x[i].classList.remove("autocomplete-active");
+        for (let item of autoCompleteList) {
+            item.classList.remove("autocomplete-active");
         }
     }
 
@@ -107,8 +125,8 @@ function autocomplete(inp) {
         except the one passed as an argument:*/
 
         let autoCompleteList = document.getElementsByClassName("autocomplete-items");
-        for(let listElement of autoCompleteList) {
-             listElement.parentNode.removeChild(listElement);
+        for (let listElement of autoCompleteList) {
+            listElement.parentNode.removeChild(listElement);
         }
     }
 
@@ -117,9 +135,6 @@ function autocomplete(inp) {
         closeAllLists();
     });
 }
-
-/*An array containing all the country names in the world:*/
-//var countries = ["Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Anguilla", "Antigua & Barbuda", "Argentina", "Armenia", "Aruba", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bermuda", "Bhutan", "Bolivia", "Bosnia & Herzegovina", "Botswana", "Brazil", "British Virgin Islands", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon", "Canada", "Cape Verde", "Cayman Islands", "Central Arfrican Republic", "Chad", "Chile", "China", "Colombia", "Congo", "Cook Islands", "Costa Rica", "Cote D Ivoire", "Croatia", "Cuba", "Curacao", "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Ethiopia", "Falkland Islands", "Faroe Islands", "Fiji", "Finland", "France", "French Polynesia", "French West Indies", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Gibraltar", "Greece", "Greenland", "Grenada", "Guam", "Guatemala", "Guernsey", "Guinea", "Guinea Bissau", "Guyana", "Haiti", "Honduras", "Hong Kong", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Isle of Man", "Israel", "Italy", "Jamaica", "Japan", "Jersey", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kosovo", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Macau", "Macedonia", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Montserrat", "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauro", "Nepal", "Netherlands", "Netherlands Antilles", "New Caledonia", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Korea", "Norway", "Oman", "Pakistan", "Palau", "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Puerto Rico", "Qatar", "Reunion", "Romania", "Russia", "Rwanda", "Saint Pierre & Miquelon", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka", "St Kitts & Nevis", "St Lucia", "St Vincent", "Sudan", "Suriname", "Swaziland", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor L'Este", "Togo", "Tonga", "Trinidad & Tobago", "Tunisia", "Turkey", "Turkmenistan", "Turks & Caicos", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States of America", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela", "Vietnam", "Virgin Islands (US)", "Yemen", "Zambia", "Zimbabwe"];
 
 /*initiate the autocomplete function on the "myInput" element, and pass along the countries array as possible autocomplete values:*/
 autocomplete(document.getElementById("userName"));
