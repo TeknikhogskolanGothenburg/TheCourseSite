@@ -1,8 +1,8 @@
 import os
 
-import werkzeug.utils
+from werkzeug.utils import secure_filename
 from bson import ObjectId
-from flask import Blueprint, redirect, url_for, render_template, request
+from flask import Blueprint, redirect, url_for, render_template, request, current_app
 from flask_login import logout_user, login_required, current_user
 
 from app.controllers.message_controller import create_message, get_all_messages_for_user, get_message_by_id
@@ -68,10 +68,11 @@ def avatar_color_post():
 def upload_avatar_post():
     photo = request.files.get('photo', None)
     if photo is not None:
-        filename, extension = os.path.splitext(photo.filename)
-        print(filename, extension)
+        filename = secure_filename(photo.filename)
+        _, extension = os.path.splitext(filename)
+
         avatar_filename = str(current_user._id) + extension
-        path = os.path.join('static','profile-img', avatar_filename)
+        path = current_app.config['AVATAR_FOLDER'] + avatar_filename
         photo.save(path)
         current_user.avatar = path
         current_user.save()
